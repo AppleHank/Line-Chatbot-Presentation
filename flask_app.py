@@ -65,10 +65,14 @@ def callback():
             continue
         if not isinstance(event.message, TextMessage):
             continue
-        print('asdasfdsafsdgfsdagf')
-        print('-'*100)
-        print(event.message.text)
-        print(type(event.message.text))
+
+        if event.message.text in ['你是誰','妳是誰']:
+            message = '我是目前就讀臺灣科技大學資管所碩一的學生李皓凱，主要研究領域為NLP，但我對CV也非常有興趣，曾時做了拿下ImageNet SOTA的論文「Noisy Student」。'
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=message)
+            )    
+
         response_text = event.message.text + '測試啦'
         line_bot_api.reply_message(
             event.reply_token,
