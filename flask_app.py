@@ -69,6 +69,7 @@ def callback():
         print('-'*100)
         print(event.message.text)
         print(type(event.message.text))
+        response_text = event.message.text + '測試啦'
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=event.message.text)
