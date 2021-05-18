@@ -72,7 +72,7 @@ def callback():
         response_text = event.message.text + '測試啦'
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=event.message.text)
+            TextSendMessage(text=response_text)
         )
 
     return 'OK'
@@ -87,3 +87,7 @@ if __name__ == "__main__":
     options = arg_parser.parse_args()
 
     app.run(debug=options.debug, port=options.port)
+
+
+#to see log
+#heroku logs --tail --app line-tech-fresh-hank
