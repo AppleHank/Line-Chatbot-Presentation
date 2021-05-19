@@ -103,7 +103,12 @@ def message_image(event):
 
     response_image = open('sample_image/Kim.jpg','rb')
     line_bot_api.reply_message(
-        event.relpy_token,
+        event.reply_token,
+        ImageMessage(response_image)
+    )
+    response_image = open('sample_image/image_message.jpg','rb')
+    line_bot_api.reply_message(
+        event.reply_token,
         ImageMessage(response_image)
     )
 
