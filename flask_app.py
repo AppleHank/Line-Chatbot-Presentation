@@ -79,9 +79,9 @@ def callback():
             TextSendMessage(text=message)
             )    
 
-        response_text = event.message.text + '測試'
+        response_text = event.message.text + '測試_in_falsk_app'
         line_bot_api.reply_message(
-            event.reply_token,
+            event.reply_token, #reply_token will generate once when users send message to my chatbot, prely_token will be abandoned after my chatbot reply message to user
             TextSendMessage(text=response_text)
         )
 
