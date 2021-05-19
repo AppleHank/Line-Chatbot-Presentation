@@ -1,1 +1,1 @@
- web: gunicorn app_with_handler:app –log-file -
+ web: gunicorn app_kitchensink:app –log-file -
