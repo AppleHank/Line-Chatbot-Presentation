@@ -17,6 +17,7 @@ from __future__ import unicode_literals
 import os
 import sys
 from argparse import ArgumentParser
+import configparser
 
 from flask import Flask, request, abort
 from linebot import (
@@ -32,8 +33,13 @@ from linebot.models import (
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
-channel_secret = '683e87d94bfd4c032c40164eb26d3c5d'
-channel_access_token = 'FCDhYxaGG1PNpKLIlc1smwVjfH6vzXKp4XUYNystg09g0hlFyl4peur2cPg95+lRuZRBuFrl2ObDqdjqv2jTyB0edgqgFK1Z3dqw10BOnbHF4ldDGoTAO/O+Ud1qGp869gogC5M1tSbsbvo4dnU0YgdB04t89/1O/w1cDnyilFU='
+
+# LINE 聊天機器人的基本資料
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+channel_secret = config.get('line-bot', 'channel_access_token')
+channel_access_token = config.get('line-bot', 'channel_secret')
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
     sys.exit(1)
