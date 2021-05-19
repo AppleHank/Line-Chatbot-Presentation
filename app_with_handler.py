@@ -15,6 +15,7 @@
 import os
 import sys
 from argparse import ArgumentParser
+import configparser
 
 from flask import Flask, request, abort
 from linebot import (
@@ -31,8 +32,11 @@ from linebot.models.messages import ImageMessage
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
-channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
-channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+channel_secret = config.get('line-bot', 'channel_access_token')
+channel_access_token = config.get('line-bot', 'channel_secret')
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
     sys.exit(1)
