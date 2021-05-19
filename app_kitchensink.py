@@ -573,10 +573,15 @@ def handle_content_message(event):
         for chunk in message_content.iter_content():
             tf.write(chunk)
         tempfile_path = tf.name
-
+    print('---temp_file_path:---')
+    print(tempfile_path)
     dist_path = tempfile_path + '.' + ext
+    print('---dis_path---')
+    print(dist_path)
     dist_name = os.path.basename(dist_path)
     os.rename(tempfile_path, dist_path)
+
+    print(os.path.join('static', 'tmp', dist_name))
 
     line_bot_api.reply_message(
         event.reply_token, [
