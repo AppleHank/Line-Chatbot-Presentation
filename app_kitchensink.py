@@ -568,6 +568,11 @@ def handle_content_message(event):
     else:
         return
 
+    print('-'*100)
+    print(os.path.exists(static_tmp_path))
+    print(static_tmp_path)
+    print('-'*100)
+
     message_content = line_bot_api.get_message_content(event.message.id)
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
         for chunk in message_content.iter_content():
