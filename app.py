@@ -29,7 +29,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    FollowEvent, MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, TemplateSendMessage, ButtonsTemplate, MessageAction
+    FollowEvent, MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, TemplateSendMessage, CarouselTemplate, CarouselColumn, ButtonsTemplate, MessageAction
 )
 from linebot.models.messages import ImageMessage
 
@@ -52,8 +52,6 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
-
-
 user_image_path = os.path.join(os.path.dirname(__file__),'facial_recog_dataset','user')
 def make_user_img_dir():
     print(f'user_image_path:{user_image_path}')
@@ -64,6 +62,30 @@ def make_user_img_dir():
         print('create user image dir error')
         print(f"error : {e}")
         pass
+
+def get_server_url():
+    return 'http://140.118.109.198:3000/'#IP from my lab, I build a server to process facial recognition
+
+def set_demo_mode(demo_mode):
+    url =  get_server_url()
+    data = {'request_mode':'set','demo_mode':demo_mode,'user':event.source.user_id}
+    resp = post(url=url, json=data)
+
+def get_CV_demo_template(text):
+    response_text = TextSendMessage(text=text)
+    ButtonsTemplate(
+        title='皓凱Chatbot', text='作品Demo選單', actions=[
+            MessageAction(label='人臉相似度', text='人臉相似度'),
+            MessageAction(label='臉部情緒分析', text='臉部情緒分析'),
+        ])
+    template_message = TemplateSendMessage(
+        alt_text='作品Demo', template=buttons_template)
+    
+    messages = [
+        response_text,
+        template_message
+    ]
+    return messages
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -84,6 +106,8 @@ def callback():
 
 @handler.add(FollowEvent)
 def handle_follow(event):
+    set_demo_mode('default')
+
     app.logger.info("Got Follow event:" + event.source.user_id)
     follow_buttons_template = ButtonsTemplate(
             title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
@@ -170,20 +194,20 @@ def message_text(event):
         )
 
     elif text == 'BERT for IR':
-        response_text = '------ BERT for Informaiton Retrieval(IR) ------\n \
-在這個作品中我實作了搜尋引擎，將BERT、XLNet、RoBERTa等語言模型融入傳統的IR模型BM25，成功將準確率提升約莫10%。\n \
-\n \
-[任務目標]\n \
+        response_text = '------ BERT for Informaiton Retrieval(IR) ------\n\
+我實作了搜尋引擎，將BERT、XLNet、RoBERTa等語言模型融入傳統的IR模型BM25，成功將準確率提升約莫10%。\n\
+\n\
+[任務目標]\n\
 輸入一串sequence，輸出top-1000關聯的文章\n\
-[資料集]\n \
+[資料集]\n\
 200筆Query + 100,000篇網頁(Document)\n\
-\n \
-[作品介紹]\n \
+\n\
+[作品介紹]\n\
 \n\
 在IR領域中，由於每一個Query(搜尋的關鍵字)的正相關樣本(有關聯的網頁)數量通常不到一百筆，對Deep Learning來說是非常不夠的，因此Depp Learning的模型在IR領域中往往不比傳統的方法來的好。\n \
 因此我將重心擺在傳統模型BM25，對於每一筆Query都先計算出所有網頁的分數，取出top-1000後再將這些網頁以「Multiple Choice」的方式訓練BERT。最後再將訓練出的BERT和BM25 ensemble，成功在校內的Kaggle比賽獲得第三名。\n \
 \n\
-[訓練技巧]\n \
+[訓練技巧]\n\
 BERT的input長度限制512個token，但一篇文章動輒上千個文字，導致無法將所有token放入BERT。\
 為了解決這個問題，我使用一個長度512的sliding window，對於每一篇文章都只擷取這個sliding window底下的文字當成文章，並使用BM25計算分數後移動sliding window，最後將分數最高的windwo視為這篇文章，丟進BERT。\
 '
@@ -193,39 +217,29 @@ BERT的input長度限制512個token，但一篇文章動輒上千個文字，導
         )
 
     elif text == 'Noisy Student':
-        response_text = '------ Noisy Student ------\n \
-                        在這個作品中我實作了ImageNet上的SOTA論文 「Noisy Student」，成功透過semi-supervise的方式運用Unlabeled Data，配合Distilation的方式將準確率提升20%。\n \
-                        \n \
-                        [任務目標]\n \
-                        輸入一張圖片，輸出圖片類別(11種)\n\
-                        [資料集]\n \
-                        Food-11，11種食物的分類資料，3,000張labeled data, 6000張unlabeled data\n\
-                        \n \
-                        [作品介紹]\n \
-                        \n\
-                        Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指標性的semi-supervised learning的方式，也在當時拿下了ImageNet上的SAOTA。\
-                        我將作品實作於食物分類資料集，先使用labeled data訓練出第一代Teacher Model，利用Teacher Model在unlabeled data上產生pseudo-labeled data，同時考慮imbalance的問題。\
-                        接著再將pseudo-labeled data與labeled data結合，利用這些data訓練第一代的Student Model，訓練結束後再將Student Model變為第二代的Teacher Model，如此疊帶的去訓練，最終從第一代的64%準確率提升至84%。\
-                        '
+        response_text = '------ Noisy Student ------\n\
+我實作了ImageNet上的SOTA論文 「Noisy Student」，成功透過semi-supervise的方式運用Unlabeled Data，配合Distilation的方式將準確率提升20%。\n \
+\n\
+[任務目標]\n\
+輸入一張圖片，輸出圖片類別(11種)\n\
+[資料集]\n\
+Food-11，11種食物的分類資料，3,000張labeled data, 6000張unlabeled data\n\
+\n\
+[作品介紹]\n\
+\n\
+Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指標性的semi-supervised learning的方式，也在當時拿下了ImageNet上的SAOTA。\
+我將作品實作於食物分類資料集，先使用labeled data訓練出第一代Teacher Model，利用Teacher Model在unlabeled data上產生pseudo-labeled data，同時考慮imbalance的問題。\
+接著再將pseudo-labeled data與labeled data結合，利用這些data訓練第一代的Student Model，訓練結束後再將Student Model變為第二代的Teacher Model，如此疊帶的去訓練，最終從第一代的64%準確率提升至84%。\
+'
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response_text)
         )
 
     elif text == '作品Demo':
-        response_text = TextSendMessage(text='將展示「人臉相似度比對」以及「臉部情緒分析」作品，請選擇模式。\ngithub : https://github.com/AppleHank/FaceNet')
-        buttons_template = ButtonsTemplate(
-        title='皓凱Chatbot', text='作品Demo選單', actions=[
-            MessageAction(label='人臉相似度', text='人臉相似度'),
-            MessageAction(label='臉部情緒分析', text='臉部情緒分析'),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='作品Demo', template=buttons_template)
+        text = '將展示「人臉相似度比對」以及「臉部情緒分析」作品，請選擇模式。\ngithub : https://github.com/AppleHank/FaceNet'
+        messages = get_CV_demo_template(text)
 
-        messages = [
-            response_text,
-            template_message
-        ]
         line_bot_api.reply_message(
             event.reply_token,
             messages
@@ -233,9 +247,8 @@ BERT的input長度限制512個token，但一篇文章動輒上千個文字，導
 
     elif text == '人臉相似度':
         response_text = '請上傳一張照片，將會與四名藝人比較相似度'
-        url = 'http://140.118.109.198:3000/' #IP from my lab, I build a server to process facial recognition
-        data = {'request_mode':'set','demo_mode':'facial_recognition','user':event.source.user_id}
-        resp = post(url=url, json=data)
+        
+        set_demo_mode('facial_recognition')
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -245,9 +258,7 @@ BERT的input長度限制512個token，但一篇文章動輒上千個文字，導
     elif text == '臉部情緒分析':
         response_text = '請上傳一張照片，將會分析屬於 「正常 / 開心 / 生氣」 其中一種情緒'
 
-        url = 'http://140.118.109.198:3000/' #IP from my lab, I build a server to process facial recognition
-        data = {'request_mode':'set','demo_mode':'emotion_recognition','user':event.source.user_id}
-        resp = post(url=url, json=data)
+        set_demo_mode('emotion_recognition')    
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -346,8 +357,21 @@ def get_reply_list(data):
 
 @handler.add(MessageEvent, message=ImageMessage)
 def message_image(event):
-    ext = 'jpg'
+    
+    url = get_server_url()
+    mode = post(url=url,json={'request_mode':'retrieve','user':event.source.user_id}).json()['mode']
+    if mode == 'default':
+        text = '若想使用CV相關demo，請選擇以下模式'
+        messages = get_CV_demo_template(text)
+        line_bot_api.reply_message(
+            event.reply_token,
+            messages
+        )
+        print('end')
+        return
+    print('entttttt')
 
+    ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
     make_user_img_dir()
     message_iter_content = message_content.iter_content()
@@ -356,14 +380,12 @@ def message_image(event):
         for chunk in message_iter_content:
             fd.write(chunk)
     #-------------------------------------------------------------
-    url = 'http://140.118.109.198:3000/' #IP from my lab, I build a server to process facial recognition
-    mode = post(url=url,json={'request_mode':'retrieve','user':event.source.user_id}).json()['mode']
-    resp = get_response(url,path,event,mode)
     print(f"resp:{resp}")
     if resp is None:
         print('is None')
         return
-    
+
+    resp = get_response(url,path,event,mode)
     data = resp.json()
     if mode == 'facial_recognition':
         # message = get_reply_list(data)
