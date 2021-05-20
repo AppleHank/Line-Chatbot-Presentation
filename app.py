@@ -66,7 +66,7 @@ def make_user_img_dir():
 def get_server_url():
     return 'http://140.118.109.198:3000/'#IP from my lab, I build a server to process facial recognition
 
-def set_demo_mode(demo_mode):
+def set_demo_mode(demo_mode,event):
     url =  get_server_url()
     data = {'request_mode':'set','demo_mode':demo_mode,'user':event.source.user_id}
     resp = post(url=url, json=data)
@@ -106,7 +106,7 @@ def callback():
 
 @handler.add(FollowEvent)
 def handle_follow(event):
-    set_demo_mode('default')
+    set_demo_mode('default',event)
 
     app.logger.info("Got Follow event:" + event.source.user_id)
     follow_buttons_template = ButtonsTemplate(
@@ -248,7 +248,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
     elif text == '人臉相似度':
         response_text = '請上傳一張照片，將會與四名藝人比較相似度'
         
-        set_demo_mode('facial_recognition')
+        set_demo_mode('facial_recognition',event)
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -258,7 +258,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
     elif text == '臉部情緒分析':
         response_text = '請上傳一張照片，將會分析屬於 「正常 / 開心 / 生氣」 其中一種情緒'
 
-        set_demo_mode('emotion_recognition')    
+        set_demo_mode('emotion_recognition',event)    
 
         line_bot_api.reply_message(
             event.reply_token,
