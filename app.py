@@ -89,7 +89,7 @@ def handle_follow(event):
             title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
                 MessageAction(label='你是誰', text='你是誰'),
                 MessageAction(label='履歷', text='履歷'),
-                MessageAction(label='經歷 / 作品', text='經歷 / 作品'),
+                MessageAction(label='經歷 / 作品', text='工作經歷 / 作品'),
                 MessageAction(label='臉部辨識/情緒分析 模型Demo', text='作品Demo'),
             ])
     template_message = TemplateSendMessage(
@@ -130,17 +130,15 @@ def message_text(event):
 
     elif text == '工作經歷':
         response_text = '------ 國泰世華銀行 | DDT - MLOps Intern ------\n \
-                        任職期間，我擔任組長與組員在「AWS與GCP」上開發兩個ML專案，分別為「預測部門部屬的服務的流量」與「於門禁系統以人臉辨識取代刷卡辨識」。\n \
-                        在技術方面，我負責了「資料蒐集、資料前處理、模型選擇、模型訓練、雲端平台Survey」。\n \
-                        我也負責與Mentor溝通，主持組內的daily scrum，統整進度，控管專案時程。\n \
-                        \n \
-                        ------ 碩軟 | Data Analyst Intern ------\n \
-                        碩軟是與微軟合作的外商公司，在我任職期間我「獨自接下了一個客戶的專案」，這個專案會使用到Azure OCR服務，但若只使用OCR，準確率約只有80%。\
-                        但「我將OCR與我設計的模型結合」，「運用NLP的方式」成功將準確率「提升至98%以上」，成功完成專案。\n \
-                        \n \
-                        ------ 芬格遊戲 | Data Analyst Intern ------\n \
-                        我與組員參加芬格公司舉辦的遊戲開發競賽，擔任組內唯一一個工程師，「自學所有技術」並「獨自撰寫約莫兩萬行的所有程式碼」，被公司從十幾組中選為唯一一組接受輔導，嘗試將遊戲上架的組別。\
-                        '
+任職期間，我擔任組長與組員在「AWS與GCP」上開發兩個ML專案，分別為「預測部門部屬的服務的流量」與「於門禁系統以人臉辨識取代刷卡辨識」。\n \
+在技術方面，我負責了「資料蒐集、資料前處理、模型選擇、模型訓練、雲端平台Survey」。\n \
+我也負責與Mentor溝通，主持組內的daily scrum，統整進度，控管專案時程。\n \
+\n------ 碩軟 | Data Analyst Intern ------\n \
+碩軟是與微軟合作的外商公司，在我任職期間我「獨自接下了一個客戶的專案」，這個專案會使用到Azure OCR服務，但若只使用OCR，準確率約只有80%。\
+但「我將OCR與我設計的模型結合」，「運用NLP的方式」成功將準確率「提升至98%以上」，成功完成專案。\n \
+\n------ 芬格遊戲 | Data Analyst Intern ------\n \
+我與組員參加芬格公司舉辦的遊戲開發競賽，擔任組內唯一一個工程師，「自學所有技術」並「獨自撰寫約莫兩萬行的所有程式碼」，被公司從十幾組中選為唯一一組接受輔導，嘗試將遊戲上架的組別。\
+'
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response_text)
@@ -173,22 +171,22 @@ def message_text(event):
 
     elif text == 'BERT for IR':
         response_text = '------ BERT for Informaiton Retrieval(IR) ------\n \
-                        在這個作品中我實作了搜尋引擎，將BERT、XLNet、RoBERTa等語言模型融入傳統的IR模型BM25，成功將準確率提升約莫10%。\n \
-                        \n \
-                        [任務目標]\n \
-                        輸入一串sequence，輸出top-1000關聯的文章\n\
-                        [資料集]\n \
-                        200筆Query + 100,000篇網頁(Document)\n\
-                        \n \
-                        [作品介紹]\n \
-                        \n\
-                        在IR領域中，由於每一個Query(搜尋的關鍵字)的正相關樣本(有關聯的網頁)數量通常不到一百筆，對Deep Learning來說是非常不夠的，因此Depp Learning的模型在IR領域中往往不比傳統的方法來的好。\n \
-                        因此我將重心擺在傳統模型BM25，對於每一筆Query都先計算出所有網頁的分數，取出top-1000後再將這些網頁以「Multiple Choice」的方式訓練BERT。最後再將訓練出的BERT和BM25 ensemble，成功在校內的Kaggle比賽獲得第三名。\n \
-                        \n\
-                        [訓練技巧]\n \
-                        BERT的input長度限制512個token，但一篇文章動輒上千個文字，導致無法將所有token放入BERT。\
-                        為了解決這個問題，我使用一個長度512的sliding window，對於每一篇文章都只擷取這個sliding window底下的文字當成文章，並使用BM25計算分數後移動sliding window，最後將分數最高的windwo視為這篇文章，丟進BERT。\
-                        '
+在這個作品中我實作了搜尋引擎，將BERT、XLNet、RoBERTa等語言模型融入傳統的IR模型BM25，成功將準確率提升約莫10%。\n \
+\n \
+[任務目標]\n \
+輸入一串sequence，輸出top-1000關聯的文章\n\
+[資料集]\n \
+200筆Query + 100,000篇網頁(Document)\n\
+\n \
+[作品介紹]\n \
+\n\
+在IR領域中，由於每一個Query(搜尋的關鍵字)的正相關樣本(有關聯的網頁)數量通常不到一百筆，對Deep Learning來說是非常不夠的，因此Depp Learning的模型在IR領域中往往不比傳統的方法來的好。\n \
+因此我將重心擺在傳統模型BM25，對於每一筆Query都先計算出所有網頁的分數，取出top-1000後再將這些網頁以「Multiple Choice」的方式訓練BERT。最後再將訓練出的BERT和BM25 ensemble，成功在校內的Kaggle比賽獲得第三名。\n \
+\n\
+[訓練技巧]\n \
+BERT的input長度限制512個token，但一篇文章動輒上千個文字，導致無法將所有token放入BERT。\
+為了解決這個問題，我使用一個長度512的sliding window，對於每一篇文章都只擷取這個sliding window底下的文字當成文章，並使用BM25計算分數後移動sliding window，最後將分數最高的windwo視為這篇文章，丟進BERT。\
+'
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response_text)
@@ -326,10 +324,10 @@ def get_reply_list(data):
         star_name_eng = similarity[0]
         star_name_chi = eng_name_to_chinese[star_name_eng]
         img_url = request.url_root + '/static/' + star_name_eng + '/' + file_name
+        score = similarity[1]
         print(f"img_url : {img_url}")
         print(f"score : {score}")
         print(f"title:{star_name_chi}")
-        score = similarity[1]
         carousel_columns.append(CarouselColumn(
             thumbnail_image_url=img_url,
             text=(str)(score), 
