@@ -361,7 +361,7 @@ def message_image(event):
     url = 'http://140.118.109.198:3000/' #IP from my lab, I build a server to process facial recognition
     mode = post(url=url,json={'request_mode':'retrieve','user':event.source.user_id}).json()['mode']
     resp = get_response(url,path,event,mode)
-    print(f"resp:{resp)}")
+    print(f"resp:{resp}")
     if resp is None:
         print('is None')
         return
