@@ -87,6 +87,46 @@ def get_CV_demo_template(text):
     ]
     return messages
 
+
+def get_sever_answer(url,path,event,mode):
+    data = {}
+    data['request_mode'] = 'get'
+    data['mode'] = mode
+    with open(path,'rb') as img:
+        image = base64.b64encode(img.read()).decode('latin1')
+        data['ProcessedImage'] = image    
+    if mode == 'facial_recognition':
+        data['top_n'] = 2 #Can't set over 3, because one top_n message will send one TextSendMessage and ImageSendMessage, if top_n = 3, will send 6 message, which exceed limiation of free line chatbot acount
+    
+    resp = post(url=url, json=data)
+    if resp.status_code != 200:
+        message = TextSendMessage(text='無法捕捉臉部，請嘗試上傳更高解析度 / 確認臉部垂直於地面')
+        line_bot_api.reply_message(
+        event.reply_token, message)
+        return None
+    return resp
+
+def get_carousel_columns(data):
+    carousel_columns = []
+    top_similarity = data['similarity'] # <tuple> (<str> name of a similar star, <int> similarity score between 0 to 100)
+    file_names = data['names']
+    eng_name_to_chinese = {'ihow':'劉以豪','chenwu':'金城武','user':'李皓凱','jaychou':'周杰倫','chi0':'林志玲'}
+    for index,(file_name,similarity) in enumerate(zip(file_names,top_similarity)):
+        star_name_eng = similarity[0]
+        star_name_chi = eng_name_to_chinese[star_name_eng]
+        img_url = request.url_root + '/static/' + star_name_eng + '/' + file_name
+        score = similarity[1]
+        print(f"img_url:{img_url}")
+        carousel_columns.append(CarouselColumn(
+            thumbnail_image_url=img_url,
+            text=(str)(score)+' / 100', 
+            title=star_name_chi, 
+            actions=[
+                URIAction(label=f'搜尋{star_name_chi}', uri=f'https://www.google.com/search?q={star_name_chi}'),
+            ]
+        ))
+    return carousel_columns
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -307,47 +347,6 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
             messages
         )   
 
-
-def get_response(url,path,event,mode):
-    data = {}
-    data['request_mode'] = 'get'
-    data['mode'] = mode
-    with open(path,'rb') as img:
-        image = base64.b64encode(img.read()).decode('latin1')
-        data['ProcessedImage'] = image    
-    if mode == 'facial_recognition':
-        data['top_n'] = 2 #Can't set over 3, because one top_n message will send one TextSendMessage and ImageSendMessage, if top_n = 3, will send 6 message, which exceed limiation of free line chatbot acount
-    
-    resp = post(url=url, json=data)
-    if resp.status_code != 200:
-        message = TextSendMessage(text='無法捕捉臉部，請嘗試上傳更高解析度 / 確認臉部垂直於地面')
-        line_bot_api.reply_message(
-        event.reply_token, message)
-        return None
-    return resp
-
-def get_reply_list(data):
-    # reply_list = []
-    carousel_columns = []
-    top_similarity = data['similarity'] # <tuple> (<str> name of a similar star, <int> similarity score between 0 to 100)
-    # row_images = data['pictures'] # base64 data
-    file_names = data['names']
-    eng_name_to_chinese = {'ihow':'劉以豪','chenwu':'金城武','user':'李皓凱','jaychou':'周杰倫','chi0':'林志玲'}
-    for index,(file_name,similarity) in enumerate(zip(file_names,top_similarity)):
-        star_name_eng = similarity[0]
-        star_name_chi = eng_name_to_chinese[star_name_eng]
-        img_url = request.url_root + '/static/' + star_name_eng + '/' + file_name
-        score = similarity[1]
-        carousel_columns.append(CarouselColumn(
-            thumbnail_image_url=img_url,
-            text=(str)(score)+' / 100', 
-            title=star_name_chi, 
-            actions=[
-                URIAction(label=f'搜尋{star_name_chi}', uri=f'https://www.google.com/search?q={star_name_chi}'),
-            ]
-        ))
-    return carousel_columns
-
 @handler.add(MessageEvent, message=ImageMessage)
 def message_image(event):
     
@@ -374,15 +373,14 @@ def message_image(event):
             fd.write(chunk)
     #-------------------------------------------------------------
 
-    resp = get_response(url,path,event,mode)
+    resp = get_sever_answer(url,path,event,mode)
     print(f"resp:{resp}")
     if resp is None:
-        print('is None')
         return
     data = resp.json()
     if mode == 'facial_recognition':
-        # message = get_reply_list(data)
-        columns = get_reply_list(data)
+        # message = get_carousel_columns(data)
+        columns = get_carousel_columns(data)
         carousel_template = CarouselTemplate(columns=columns)
         message = TemplateSendMessage(
             alt_text='Carousel alt text', template=carousel_template)
