@@ -169,7 +169,7 @@ def handle_follow(event):
     messages = get_info_message(text)
     app.logger.info("Got Follow event:" + event.source.user_id)
     
-    line_bot_api.reply_message(event.reply_token, template_message)
+    line_bot_api.reply_message(event.reply_token, messages)
 
 @handler.add(MessageEvent, message=TextMessage)
 def message_text(event):
@@ -355,11 +355,10 @@ def message_image(event):
     #-------------------------------------------------------------
 
     resp = get_sever_answer(url,path,event,mode)
-    if resp is None:
+    if resp is None: #if no face detected
         return
     data = resp.json()
     if mode == 'facial_recognition':
-        # message = get_carousel_columns(data)
         columns = get_carousel_columns(data)
         carousel_template = CarouselTemplate(columns=columns)
         message = TemplateSendMessage(
