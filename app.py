@@ -21,7 +21,7 @@ from requests import post
 import base64
 from datetime import timedelta
 
-from flask import Flask, request, abort, session, send_from_directory
+from flask import Flask, request, abort, session
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -116,7 +116,6 @@ def get_carousel_columns(data):
         star_name_chi = eng_name_to_chinese[star_name_eng]
         img_url = request.url_root + '/static/' + star_name_eng + '/' + file_name
         score = similarity[1]
-        print(f"img_url:{img_url}")
         carousel_columns.append(CarouselColumn(
             thumbnail_image_url=img_url,
             text=(str)(score)+' / 100', 
@@ -359,9 +358,7 @@ def message_image(event):
             event.reply_token,
             messages
         )
-        print('end')
         return
-    print('entttttt')
 
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
@@ -374,7 +371,6 @@ def message_image(event):
     #-------------------------------------------------------------
 
     resp = get_sever_answer(url,path,event,mode)
-    print(f"resp:{resp}")
     if resp is None:
         return
     data = resp.json()
@@ -391,11 +387,6 @@ def message_image(event):
 
     line_bot_api.reply_message(
         event.reply_token, message)
-
-@app.route('/static/<path:path>')
-def send_static_content(path):
-    print('-'*20)
-    return send_from_directory('static', path)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
