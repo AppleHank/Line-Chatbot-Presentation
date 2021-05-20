@@ -392,7 +392,9 @@ def message_image(event):
     line_bot_api.reply_message(
         event.reply_token, message)
 
-
+@app.route('/static/<path:path>')
+def send_static_content(path):
+    return send_from_directory('static', path)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
