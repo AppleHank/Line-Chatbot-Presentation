@@ -49,8 +49,6 @@ from linebot.models import (
     SeparatorComponent, QuickReply, QuickReplyButton,
     ImageSendMessage)
 
-import facial_emotion_model
-import facial_recognition_model
 from requests import post
 import base64
 import io
