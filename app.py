@@ -251,7 +251,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
         )
 
     elif text == '人臉相似度':
-        response_text = '請上傳一張照片，將會與四名藝人比較相似度'
+        response_text = '請上傳一張照片，將會與四名藝人比較相似度，上傳後請稍等約五秒'
         
         set_demo_mode('facial_recognition',event)
 
@@ -261,7 +261,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
         )
 
     elif text == '臉部情緒分析':
-        response_text = '請上傳一張照片，將會分析屬於 「正常 / 開心 / 生氣」 其中一種情緒'
+        response_text = '請上傳一張照片，將會分析屬於 「正常 / 開心 / 生氣」 其中一種情緒，上傳後請稍等約五秒'
 
         set_demo_mode('emotion_recognition',event)    
 
@@ -318,11 +318,8 @@ def get_response(url,path,event,mode):
     if mode == 'facial_recognition':
         data['top_n'] = 2 #Can't set over 3, because one top_n message will send one TextSendMessage and ImageSendMessage, if top_n = 3, will send 6 message, which exceed limiation of free line chatbot acount
     
-    try:
-        resp = post(url=url, json=data)
-    except (ValueError, AttributeError):
-        print('-'*100)
-        print('error')
+    resp = post(url=url, json=data)
+    if resp.status_code != 200:
         message = TextSendMessage(text='無法捕捉臉部，請嘗試上傳更高解析度 / 確認臉部垂直於地面')
         line_bot_api.reply_message(
         event.reply_token, message)
@@ -335,28 +332,20 @@ def get_reply_list(data):
     top_similarity = data['similarity'] # <tuple> (<str> name of a similar star, <int> similarity score between 0 to 100)
     # row_images = data['pictures'] # base64 data
     file_names = data['names']
-    eng_name_to_chinese = {'ihow':'劉以豪','chenwu':'金城武','user':'user','jaychou':'周杰倫','chi0':'林志玲'}
+    eng_name_to_chinese = {'ihow':'劉以豪','chenwu':'金城武','user':'李皓凱','jaychou':'周杰倫','chi0':'林志玲'}
     for index,(file_name,similarity) in enumerate(zip(file_names,top_similarity)):
         star_name_eng = similarity[0]
         star_name_chi = eng_name_to_chinese[star_name_eng]
         img_url = request.url_root + '/static/' + star_name_eng + '/' + file_name
         score = similarity[1]
-        print(f"img_url : {img_url}")
-        print(f"score : {score}")
-        print(f"title:{star_name_chi}")
         carousel_columns.append(CarouselColumn(
             thumbnail_image_url=img_url,
-            text=(str)(score), 
+            text=(str)(score)+' / 100', 
             title=star_name_chi, 
             actions=[
                 URIAction(label=f'搜尋{star_name_chi}', uri=f'https://www.google.com/search?q={star_name_chi}'),
             ]
         ))
-
-
-        # reply_list.append(TextSendMessage(text=f"第 {index+1} 高相似度的藝人 : {star_name_chi}，相似度 : {similarity[1]}"))
-        # reply_list.append(ImageSendMessage(img_url, img_url))
-    # return reply_list
     return carousel_columns
 
 @handler.add(MessageEvent, message=ImageMessage)
