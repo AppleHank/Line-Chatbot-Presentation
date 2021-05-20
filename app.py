@@ -153,11 +153,11 @@ def message_text(event):
         line_bot_api.reply_message(event.reply_token, template_message)
 
     elif text == '工作經歷':
-        response_text = '------ 國泰世華銀行 | DDT - MLOps Intern ------\n \
+        response_text = '------- 國泰世華銀行 | DDT - MLOps Intern -------\n \
 任職期間，我擔任組長與組員在「AWS與GCP」上開發兩個ML專案，分別為「預測部門部屬的服務的流量」與「於門禁系統以人臉辨識取代刷卡辨識」。\n \
 在技術方面，我負責了「資料蒐集、資料前處理、模型選擇、模型訓練、雲端平台Survey」。\n \
 我也負責與Mentor溝通，主持組內的daily scrum，統整進度，控管專案時程。\n \
-\n--------- 碩軟 | Data Analyst Intern ---------\n \
+\n------------ 碩軟 | Data Analyst Intern ------------\n \
 碩軟是與微軟合作的外商公司，在我任職期間我「獨自接下了一個客戶的專案」，這個專案會使用到Azure OCR服務，但若只使用OCR，準確率約只有80%。\
 但「我將OCR與我設計的模型結合」，「運用NLP的方式」成功將準確率「提升至98%以上」，成功完成專案。\n \
 \n------- 芬格遊戲 | software enginner Intern -------\n \
@@ -167,13 +167,6 @@ def message_text(event):
             event.reply_token,
             TextSendMessage(text=response_text)
         )
-
-    # elif text == '參賽經歷':
-    #     response_text = '尚未撰寫，馬上補上！'
-    #     line_bot_api.reply_message(
-    #         event.reply_token,
-    #         TextSendMessage(text=response_text)
-    #     )
 
     elif text == '作品集':
         response_text = TextSendMessage(text='請選擇NLP作品或CV作品')
@@ -200,11 +193,11 @@ github:https://github.com/AppleHank/Bert-for-IR\n\
 \n\
 [任務目標]\n\
 輸入一串sequence，輸出top-1000關聯的文章\n\
+\n\
 [資料集]\n\
 200筆Query + 100,000篇網頁(Document)\n\
 \n\
 [作品介紹]\n\
-\n\
 在IR領域中，由於每一個Query(搜尋的關鍵字)的正相關樣本(有關聯的網頁)數量通常不到一百筆，對Deep Learning來說是非常不夠的，因此Depp Learning的模型在IR領域中往往不比傳統的方法來的好。\n \
 因此我將重心擺在傳統模型BM25，對於每一筆Query都先計算出所有網頁的分數，取出top-1000後再將這些網頁以「Multiple Choice」的方式訓練BERT。最後再將訓練出的BERT和BM25 ensemble，成功在校內的Kaggle比賽獲得第三名。\n \
 \n\
@@ -224,18 +217,28 @@ github:https://github.com/AppleHank/Noisy-Student_sample\n\
 \n\
 [任務目標]\n\
 輸入一張圖片，輸出圖片類別(11種)\n\
+\n\
 [資料集]\n\
 Food-11，11種食物的分類資料，3,000張labeled data, 6000張unlabeled data\n\
 \n\
 [作品介紹]\n\
-\n\
 Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指標性的semi-supervised learning的方式，也在當時拿下了ImageNet上的SAOTA。\
 我將作品實作於食物分類資料集，先使用labeled data訓練出第一代Teacher Model，利用Teacher Model在unlabeled data上產生pseudo-labeled data，同時考慮imbalance的問題。\
 接著再將pseudo-labeled data與labeled data結合，利用這些data訓練第一代的Student Model，訓練結束後再將Student Model變為第二代的Teacher Model，如此疊帶的去訓練，最終從第一代的64%準確率提升至84%。\
 '
+
+        TextSendMessage(text=response_text)
+        G1_url = request.url_root + '/static/noisy_student/G_1_OK.png'
+        G2_url = request.url_root + '/static/noisy_student/G_2_OK.png'
+        messages = [
+            TextSendMessage(text=response_text),
+            ImageSendMessage(G1_url,G1_url)
+            ImageSendMessage(G2_url,G2_url),
+        ]
+
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=response_text)
+            messages
         )
 
     elif text == '作品Demo':
@@ -382,12 +385,12 @@ def message_image(event):
         for chunk in message_iter_content:
             fd.write(chunk)
     #-------------------------------------------------------------
+
+    resp = get_response(url,path,event,mode)
     print(f"resp:{resp}")
     if resp is None:
         print('is None')
         return
-
-    resp = get_response(url,path,event,mode)
     data = resp.json()
     if mode == 'facial_recognition':
         # message = get_reply_list(data)
