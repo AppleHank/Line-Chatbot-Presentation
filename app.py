@@ -71,7 +71,7 @@ def set_demo_mode(demo_mode,event):
     data = {'request_mode':'set','demo_mode':demo_mode,'user':event.source.user_id}
     resp = post(url=url, json=data)
 
-def get_CV_demo_template(text):
+def get_CV_demo_message(text):
     response_text = TextSendMessage(text=text)
     buttons_template = ButtonsTemplate(
         title='皓凱Chatbot', text='作品Demo選單', actions=[
@@ -86,7 +86,25 @@ def get_CV_demo_template(text):
         template_message
     ]
     return messages
+    
+def get_info_message(text):
+    response_text = TextSendMessage(text=text)
+    follow_buttons_template = ButtonsTemplate(
+    title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
+        MessageAction(label='你是誰', text='你是誰'),
+        MessageAction(label='履歷', text='履歷'),
+        MessageAction(label='實習經歷 / 作品', text='實習經歷 / 作品'),
+        MessageAction(label='臉部辨識/情緒分析 模型Demo', text='作品Demo'),
+    ])
+    template_message = TemplateSendMessage(
+    alt_text='了解我', template=follow_buttons_template)
 
+    
+    messages = [
+        response_text,
+        template_message
+    ]
+    return messages
 
 def get_sever_answer(url,path,event,mode):
     data = {}
@@ -147,16 +165,10 @@ def callback():
 def handle_follow(event):
     set_demo_mode('default',event)
 
+    text = '你好，這個聊天機器人是由 李皓凱 為了Line Tech Fresh實習所製作，目前有以下功能：'
+    messages = get_info_message(text)
     app.logger.info("Got Follow event:" + event.source.user_id)
-    follow_buttons_template = ButtonsTemplate(
-            title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
-                MessageAction(label='你是誰', text='你是誰'),
-                MessageAction(label='履歷', text='履歷'),
-                MessageAction(label='經歷 / 作品', text='工作經歷 / 作品'),
-                MessageAction(label='臉部辨識/情緒分析 模型Demo', text='作品Demo'),
-            ])
-    template_message = TemplateSendMessage(
-        alt_text='了解我', template=follow_buttons_template)
+    
     line_bot_api.reply_message(event.reply_token, template_message)
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -180,7 +192,7 @@ def message_text(event):
             event.reply_token, messages
             )
 
-    elif text == '工作經歷 / 作品':
+    elif text == '實習經歷 / 作品':
         buttons_template = ButtonsTemplate(
         title='皓凱Chatbot', text='經歷', actions=[
             MessageAction(label='工作經歷', text='工作經歷'),
@@ -227,7 +239,7 @@ def message_text(event):
 
     elif text == 'BERT for IR':
         response_text = '------ BERT for Informaiton Retrieval(IR) ------\n\
-我實作了搜尋引擎，將BERT、XLNet、RoBERTa等語言模型融入傳統的IR模型BM25，成功將準確率提升約莫10%。\n\
+我實作了搜尋引擎，將「BERT、XLNet、RoBERTa」等語言模型「融入傳統的IR模型BM25」，成功「將準確率提升約莫10%」。\n\
 github:https://github.com/AppleHank/Bert-for-IR\n\
 \n\
 [任務目標]\n\
@@ -251,7 +263,7 @@ BERT的input長度限制512個token，但一篇文章動輒上千個文字，導
 
     elif text == 'Noisy Student':
         response_text = '------ Noisy Student ------\n\
-我實作了ImageNet上的SOTA論文 「Noisy Student」，成功透過semi-supervise的方式運用Unlabeled Data，配合Distilation的方式將準確率提升20%。\n \
+我實作了ImageNet上的SOTA論文 「Noisy Student」，成功透過「semi-supervise」的方式運用Unlabeled Data，「配合Distilation的方式將準確率提升20%」。\n \
 github:https://github.com/AppleHank/Noisy-Student_sample\n\
 \n\
 [任務目標]\n\
@@ -282,7 +294,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
 
     elif text == '作品Demo':
         text = '將展示「人臉相似度比對」以及「臉部情緒分析」作品，請選擇模式。\ngithub : https://github.com/AppleHank/FaceNet'
-        messages = get_CV_demo_template(text)
+        messages = get_CV_demo_message(text)
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -309,38 +321,10 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
             TextSendMessage(text=response_text)
         )
 
-    elif text == '想了解':
-        follow_buttons_template = ButtonsTemplate(
-        title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
-            MessageAction(label='你是誰', text='你是誰'),
-            MessageAction(label='履歷', text='履歷'),
-            MessageAction(label='經歷 / 作品', text='經歷 / 作品'),
-            MessageAction(label='臉部辨識/情緒分析 模型Demo', text='作品Demo'),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='了解我', template=follow_buttons_template)
-
-        line_bot_api.reply_message(
-            event.reply_token, 
-            template_message
-        )
-
     else:
-        response_text = TextSendMessage(text='沒有聊天功能哦QQ 如果想要了解我，歡迎點選下方按鈕！')
-        follow_buttons_template = ButtonsTemplate(
-            title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
-                MessageAction(label='你是誰', text='你是誰'),
-                MessageAction(label='履歷', text='履歷'),
-                MessageAction(label='經歷 / 作品', text='經歷 / 作品'),
-                MessageAction(label='臉部辨識/情緒分析 模型Demo', text='作品Demo'),
-            ])
-        template_message = TemplateSendMessage(
-        alt_text='了解我', template=follow_buttons_template)
+        text = '沒有聊天功能哦QQ 如果想要了解我，歡迎點選下方按鈕！'
+        messages = get_info_message(text)
 
-        messages = [
-            response_text,
-            template_message
-        ]
         line_bot_api.reply_message(
             event.reply_token,
             messages
@@ -353,7 +337,7 @@ def message_image(event):
     mode = post(url=url,json={'request_mode':'retrieve','user':event.source.user_id}).json()['mode']
     if mode == 'default':
         text = '若想使用CV相關demo，請選擇以下模式'
-        messages = get_CV_demo_template(text)
+        messages = get_CV_demo_message(text)
         line_bot_api.reply_message(
             event.reply_token,
             messages
