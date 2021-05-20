@@ -331,7 +331,7 @@ def get_reply_list(data):
         print(f"title:{star_name_chi}")
         score = similarity[1]
         carousel_columns.append(CarouselColumn(
-            thumbnail_image_url=img_url
+            thumbnail_image_url=img_url,
             text=(str)(score), 
             title=star_name_chi, 
         #     actions=[
