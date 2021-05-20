@@ -232,7 +232,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
         G2_url = request.url_root + '/static/noisy_student/G_2_OK.png'
         messages = [
             TextSendMessage(text=response_text),
-            ImageSendMessage(G1_url,G1_url)
+            ImageSendMessage(G1_url,G1_url),
             ImageSendMessage(G2_url,G2_url),
         ]
 
