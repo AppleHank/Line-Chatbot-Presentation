@@ -21,7 +21,7 @@ from requests import post
 import base64
 from datetime import timedelta
 
-from flask import Flask, request, abort, session
+from flask import Flask, request, abort, session, send_from_directory
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -394,6 +394,7 @@ def message_image(event):
 
 @app.route('/static/<path:path>')
 def send_static_content(path):
+    print('-'*20)
     return send_from_directory('static', path)
 
 if __name__ == "__main__":
