@@ -229,11 +229,11 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
 
         TextSendMessage(text=response_text)
         G1_url = request.url_root + '/static/noisy_student/G_1_OK.png'
-        G2_url = request.url_root + '/static/noisy_student/G_2_OK.png'
+        G5_url = request.url_root + '/static/noisy_student/G_5_OK.png'
         messages = [
             TextSendMessage(text=response_text),
             ImageSendMessage(G1_url,G1_url),
-            ImageSendMessage(G2_url,G2_url),
+            ImageSendMessage(G5_url,G5_url),
         ]
 
         line_bot_api.reply_message(
@@ -348,10 +348,9 @@ def get_reply_list(data):
             thumbnail_image_url=img_url,
             text=(str)(score), 
             title=star_name_chi, 
-        #     actions=[
-        #     URIAction(label='Go to line.me', uri='https://line.me'),
-        #     PostbackAction(label='ping', data='ping')
-        # ]
+            actions=[
+                URIAction(label=f'搜尋{star_name_chi}', uri=f'https://www.google.com/search?q={star_name_chi}'),
+            ]
         ))
 
 
