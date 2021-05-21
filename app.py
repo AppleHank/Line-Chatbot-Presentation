@@ -90,14 +90,14 @@ def get_CV_demo_message(text):
 def get_info_message(text):
     response_text = TextSendMessage(text=text)
     follow_buttons_template = ButtonsTemplate(
-    title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
-        MessageAction(label='你是誰', text='你是誰'),
-        MessageAction(label='我想看履歷', text='履歷'),
-        MessageAction(label='我想看實習經歷 / 作品', text='實習經歷 / 作品'),
-        MessageAction(label='臉部辨識/情緒分析 Demo', text='作品Demo'),
-    ])
+        title='皓凱Chatbot', text='透過以下按鈕了解我!', actions=[
+            MessageAction(label='你是誰', text='你是誰'),
+            MessageAction(label='我想看履歷', text='履歷'),
+            MessageAction(label='我想看實習經歷 / 作品', text='實習經歷 / 作品'),
+            MessageAction(label='臉部辨識/情緒分析 Demo', text='作品Demo'),
+        ])
     template_message = TemplateSendMessage(
-    alt_text='了解我', template=follow_buttons_template)
+        alt_text='了解我', template=follow_buttons_template)
 
     
     messages = [
@@ -118,9 +118,10 @@ def get_sever_answer(url,path,event,mode):
     
     resp = post(url=url, json=data)
     if resp.status_code != 200:
-        message = TextSendMessage(text='無法捕捉臉部，請嘗試上傳更高解析度 / 確認臉部垂直於地面')
+        response_text = '無法捕捉臉部，請嘗試上傳更高解析度 / 確認臉部垂直於地面'
         line_bot_api.reply_message(
-        event.reply_token, message)
+            event.reply_token, TextSendMessage(text=response_text)
+        )
         return None
     return resp
 
@@ -176,29 +177,28 @@ def message_text(event):
     text = event.message.text
 
     if text == '你是誰':
+        response_text = '我是目前就讀【臺灣科技大學】【資管所碩一】的學生【李皓凱】，【主要研究領域為NLP】，對【CV領域也有極大興趣】，例如我實作過ImageNet上的SOTA論文【Noisy Student】。'
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='我是目前就讀【臺灣科技大學】【資管所碩一】的學生【李皓凱】，【主要研究領域為NLP】，對【CV領域也有極大興趣】，例如我實作過ImageNet上的SOTA論文【Noisy Student】。')
+            event.reply_token, TextSendMessage(text=response_text)
         )
 
     elif text == '履歷':
         url = 'https://drive.google.com/file/d/1qLWDvFJPEprXXH7RYa23Hrk51-H2Iwkq/view?usp=sharing'
         img_url = request.url_root + '/static/Hank_Resume.jpg'
+        response_text = f'PDF檔案連結:{url}'
         messages = [
-            TextSendMessage(text=f'PDF檔案連結:{url}'),
+            TextSendMessage(text=response_text),
             ImageSendMessage(img_url,img_url)
         ]
-        line_bot_api.reply_message(
-            event.reply_token, messages
-            )
+        line_bot_api.reply_message(event.reply_token, messages)
 
+    #-------------------------------Experiences-------------------------------
     elif text == '實習經歷 / 作品':
         buttons_template = ButtonsTemplate(
-        title='皓凱Chatbot', text='經歷', actions=[
-            MessageAction(label='想了解工作經歷', text='工作經歷'),
-            # MessageAction(label='參賽經歷', text='參賽經歷'),
-            MessageAction(label='想了解作品集', text='作品集'),
-        ])
+            title='皓凱Chatbot', text='經歷', actions=[
+                MessageAction(label='想了解工作經歷', text='工作經歷'),
+                MessageAction(label='想了解作品集', text='作品集'),
+            ])
         template_message = TemplateSendMessage(
             alt_text='經歷與作品', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
@@ -215,27 +215,25 @@ def message_text(event):
 我與組員參加芬格公司舉辦的遊戲開發競賽，擔任組內唯一一個工程師，【自學所有技術】並【獨自撰寫約莫兩萬行的所有程式碼】，被公司從十幾組中選為唯一一組接受輔導，嘗試將遊戲上架的組別。\
 '
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text)
+            event.reply_token, TextSendMessage(text=response_text)
         )
 
+    #-------------------------------Porjects-------------------------------
     elif text == '作品集':
-        response_text = TextSendMessage(text='請選擇NLP作品或CV作品')
+        response_text = '請選擇NLP作品或CV作品'
+        response_text = TextSendMessage(text=response_text)
         buttons_template = ButtonsTemplate(
-        title='皓凱Chatbot', text='作品選單', actions=[
-            MessageAction(label='想了解NLP作品', text='BERT for IR'),
-            MessageAction(label='想了解CV作品', text='Noisy Student'),
-        ])
+            title='皓凱Chatbot', text='作品選單', actions=[
+                MessageAction(label='想了解NLP作品', text='BERT for IR'),
+                MessageAction(label='想了解CV作品', text='Noisy Student'),
+            ])
         template_message = TemplateSendMessage(
             alt_text='作品', template=buttons_template)
         messages = [
             response_text,
             template_message
         ]
-        line_bot_api.reply_message(
-            event.reply_token,
-            messages
-        )
+        line_bot_api.reply_message(event.reply_token, messages)
 
     elif text == 'BERT for IR':
         response_text = '------ BERT for Informaiton Retrieval(IR) ------\n\
@@ -257,8 +255,7 @@ BERT的input長度限制512個token，但一篇文章動輒上千個文字，導
 為了解決這個問題，我使用一個長度512的sliding window，對於每一篇文章都只擷取這個sliding window底下的文字當成文章，並使用BM25計算分數後移動sliding window，最後將分數最高的windwo視為這篇文章，丟進BERT。\
 '
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text)
+            event.reply_token, TextSendMessage(text=response_text)
         )
 
     elif text == 'Noisy Student':
@@ -278,7 +275,6 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
 接著再將pseudo-labeled data與labeled data結合，利用這些data訓練第一代的Student Model，訓練結束後再將Student Model變為第二代的Teacher Model，如此疊帶的去訓練，最終從第一代的64%準確率提升至84%。\
 '
 
-        TextSendMessage(text=response_text)
         G1_url = request.url_root + '/static/noisy_student/G_1_OK.png'
         G5_url = request.url_root + '/static/noisy_student/G_5_OK.png'
         messages = [
@@ -287,48 +283,37 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
             ImageSendMessage(G5_url,G5_url),
         ]
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            messages
-        )
+        line_bot_api.reply_message(event.reply_token, messages)
 
+    #-------------------------------Demo-------------------------------
     elif text == '作品Demo':
         text = '將展示【人臉相似度比對】以及【臉部情緒分析】作品，請選擇模式。\ngithub : https://github.com/AppleHank/FaceNet'
         messages = get_CV_demo_message(text)
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            messages
-        )
+        line_bot_api.reply_message(event.reply_token, messages)
 
     elif text == '人臉相似度':
         response_text = '請上傳一張照片，將會與四名藝人比較相似度，上傳後請稍等約五秒'
-        
         set_demo_mode('facial_recognition',event)
 
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text)
+            event.reply_token, TextSendMessage(text=response_text)
         )
 
     elif text == '臉部情緒分析':
         response_text = '請上傳一張照片，將會分析屬於 【正常 / 開心 / 生氣】 其中一種情緒，上傳後請稍等約五秒'
-
         set_demo_mode('emotion_recognition',event)    
 
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text)
+            event.reply_token, TextSendMessage(text=response_text)
         )
 
+    #-------------------------------Others-------------------------------
     else:
         text = '沒有聊天功能哦QQ 如果想要了解我，歡迎點選下方按鈕！'
         messages = get_info_message(text)
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            messages
-        )   
+        line_bot_api.reply_message(event.reply_token, messages)   
 
 @handler.add(MessageEvent, message=ImageMessage)
 def message_image(event):
@@ -338,22 +323,19 @@ def message_image(event):
     if mode == 'default':
         text = '若想使用CV相關demo，請選擇以下模式'
         messages = get_CV_demo_message(text)
-        line_bot_api.reply_message(
-            event.reply_token,
-            messages
-        )
+        line_bot_api.reply_message(event.reply_token, messages)
         return
 
+    #save temp file
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
     make_user_img_dir()
-    message_iter_content = message_content.iter_content()
     path = os.path.join('facial_recog_dataset','user',event.message.id+'.'+ext)
     with open(path, 'wb') as fd:
-        for chunk in message_iter_content:
+        for chunk in message_content.iter_content():
             fd.write(chunk)
-    #-------------------------------------------------------------
 
+    #-----------------------------retrieve predict answer from server--------------------------------
     resp = get_sever_answer(url,path,event,mode)
     if resp is None: #if no face detected
         return
@@ -365,11 +347,10 @@ def message_image(event):
             alt_text='Carousel alt text', template=carousel_template)
 
     elif mode == 'emotion_recognition':
-        text = f"分析情緒：{data['emotion']}"
-        message = TextSendMessage(text=text)
+        response_text = f"分析情緒：{data['emotion']}"
+        message = TextSendMessage(text=response_text)
 
-    line_bot_api.reply_message(
-        event.reply_token, message)
+    line_bot_api.reply_message(event.reply_token, message)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
