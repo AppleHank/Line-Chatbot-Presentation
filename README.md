@@ -33,4 +33,6 @@ RASA Chatbot是開源的Natural-language understanding聊天機器人，透過Na
 以下為訓練好的Intention，可輸入類似語句，都能傳回一樣的結果。
   1. 詢問你是誰(who are you?)
   2. 想了解關於我更多的資訊(Tell me more about you)
+  3. 安慰情緒(I'm sad)
+
 ![RASA](https://github.com/AppleHank/Line-Chatbot-Presentation/blob/main/ReadMe_images/111230_smaller.jpg)

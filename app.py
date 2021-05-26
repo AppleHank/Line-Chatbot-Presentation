@@ -330,7 +330,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
             event.reply_token, TextSendMessage(text=response_text)
         )
 
-    #-------------------------------Others-------------------------------
+    #-------------------------------RASA-------------------------------
     elif isEnglish(text):
         url = get_rasa_url()
         data = {
@@ -340,16 +340,28 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
 
         try:
             resp = post(url=url,data=json.dumps(data))
-            response_text = resp.json()[0]['text']
+            response_text = ''
+            messages = []
+            for response_info in  resp.json():
+                if 'text' in response_info:
+                    messages.append(TextSendMessage(text=response_info['text']))
+                elif 'image' in response_info:
+                    url = response_info['image']
+                    messages.append(ImageSendMessage(url,url))
+                else:
+                    messages.append(TextSendMessage(text='這句回覆出了點差錯，沒辦法正常顯示QQ'))
+            
         except ConnectionError:
             response_text = '無法連接Server! 請通知Hank'
+            messages = [TextSendMessage(text=response_text)]
 
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=response_text)
+            event.reply_token, messages
         )
 
+    #-------------------------------Others-------------------------------
     else:
-        response_text = '沒有中文聊天功能哦QQ，最新版本加入了非常簡易的【RASA Chatbot英文版本Demo】，輸入英文詢問我是誰/我的經歷可以得到簡易回答！\n\n\
+        response_text = '沒有中文聊天功能哦QQ，最新版本加入了非常簡易的【RASA Chatbot英文版本Demo】，輸入英文詢問我是誰/我的經歷可以得到簡易回答！也可以分享你的情緒給Chatbot哦！\n\n\
 或是如果想要了解我，歡迎點選下方按鈕！'
         messages = get_info_message(response_text)
 
