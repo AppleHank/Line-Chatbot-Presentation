@@ -18,8 +18,10 @@ from argparse import ArgumentParser
 import configparser
 from PIL import Image
 from requests import post
+from requests.exceptions import ConnectionError
 import base64
 from datetime import timedelta
+import json
 
 from flask import Flask, request, abort, session
 from linebot import (
@@ -62,6 +64,9 @@ def make_user_img_dir():
         print('create user image dir error')
         print(f"error : {e}")
         pass
+
+def get_rasa_url():
+    return 'http://140.118.109.198:5005/webhooks/rest/webhook'
 
 def get_server_url():
     return 'http://140.118.109.198:3000/'#IP from my lab, I build a server to process facial recognition
@@ -116,13 +121,22 @@ def get_sever_answer(url,path,event,mode):
     if mode == 'facial_recognition':
         data['top_n'] = 2 #Can't set over 3, because one top_n message will send one TextSendMessage and ImageSendMessage, if top_n = 3, will send 6 message, which exceed limiation of free line chatbot acount
     
-    resp = post(url=url, json=data)
+    try:
+        resp = post(url=url, json=data)
+    except ConnectionError:
+        response_text = '無法連接Server! 請通知Hank'
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=response_text)
+        )
+        return None
+
     if resp.status_code != 200:
         response_text = '無法捕捉臉部，請嘗試上傳更高解析度 / 確認臉部垂直於地面'
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=response_text)
         )
         return None
+
     return resp
 
 def get_carousel_columns(data):
@@ -144,6 +158,14 @@ def get_carousel_columns(data):
             ]
         ))
     return carousel_columns
+
+def isEnglish(s):
+    try:
+        s.encode(encoding='utf-8').decode('ascii')
+    except UnicodeDecodeError:
+        return False
+    else:
+        return True
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -309,9 +331,27 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
         )
 
     #-------------------------------Others-------------------------------
+    elif isEnglish(text):
+        url = get_rasa_url()
+        data = {
+            "sender": event.source.user_id,  
+            "message": text
+        }
+
+        try:
+            resp = post(url=url,data=json.dumps(data))
+            response_text = resp.json()[0]['text']
+        except ConnectionError:
+            response_text = '無法連接Server! 請通知Hank'
+
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=response_text)
+        )
+
     else:
-        text = '沒有聊天功能哦QQ 如果想要了解我，歡迎點選下方按鈕！'
-        messages = get_info_message(text)
+        response_text = '沒有中文聊天功能哦QQ，最新版本加入了非常簡易的RASA Chatbot英文版本Demo，輸入英文詢問我是誰/我的經歷可以得到簡易回答！\n\
+        或是如果想要了解我，歡迎點選下方按鈕！'
+        messages = get_info_message(response_text)
 
         line_bot_api.reply_message(event.reply_token, messages)   
 
@@ -337,7 +377,7 @@ def message_image(event):
 
     #-----------------------------retrieve predict answer from server--------------------------------
     resp = get_sever_answer(url,path,event,mode)
-    if resp is None: #if no face detected
+    if resp is None: #if no face detected or server not available
         return
     data = resp.json()
     if mode == 'facial_recognition':
