@@ -24,7 +24,7 @@ Chatbot將會傳送一個botton template給使用者，選擇要使用「人臉�
 我將「人臉相似度比較」中的FaceNet接上一個Fully-Connected-layer，將512維縮放至3維度，並使用AffectNet資料集訓練模型。在前處理時，由於資料集部分人臉比例過大，無法被MTCNN有效捕捉，因此我將輸入圖片先padding後再輸入模型訓練，解決無法捕捉人臉的問題。<br />
 ![emotion recognition](https://github.com/AppleHank/Line-Chatbot-Presentation/blob/main/ReadMe_images/188656919_495260258565990_4620626799712487533_n.jpg)
 
-### RASA英文Chatbot
+## RASA英文Chatbot
 輸入英文文字，回傳聊天機器人的回應<br />
 - 介紹<br />
 RASA Chatbot是開源的Natural-language understanding聊天機器人，透過Named Entity Recognition(NER)以及Intention Recognition兩個任務來訓練Chatbot。<br />
