@@ -349,8 +349,8 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
         )
 
     else:
-        response_text = '沒有中文聊天功能哦QQ，最新版本加入了非常簡易的RASA Chatbot英文版本Demo，輸入英文詢問我是誰/我的經歷可以得到簡易回答！\n\
-        或是如果想要了解我，歡迎點選下方按鈕！'
+        response_text = '沒有中文聊天功能哦QQ，最新版本加入了非常簡易的【RASA Chatbot英文版本Demo】，輸入英文詢問我是誰/我的經歷可以得到簡易回答！\n\n\
+或是如果想要了解我，歡迎點選下方按鈕！'
         messages = get_info_message(response_text)
 
         line_bot_api.reply_message(event.reply_token, messages)   
