@@ -100,6 +100,7 @@ def get_info_message(text):
             MessageAction(label='我想看履歷', text='履歷'),
             MessageAction(label='我想看實習經歷 / 作品', text='實習經歷 / 作品'),
             MessageAction(label='臉部辨識/情緒分析 Demo', text='作品Demo'),
+            MessageAction(label='RASA Chatbot Demo', text='RASA Demo')
         ])
     template_message = TemplateSendMessage(
         alt_text='了解我', template=follow_buttons_template)
@@ -331,6 +332,12 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
         )
 
     #-------------------------------RASA-------------------------------
+    elif text == 'RASA':
+        response_text = "請輸入英文！目前支援情境為\n1.詢問你是誰(who are you?)\n2.想了解關於我更多的資訊(Tell me more about you)\n3.安慰情緒(I'm sad)""
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=response_text)
+        )
+
     elif isEnglish(text):
         url = get_rasa_url()
         data = {
@@ -396,7 +403,7 @@ def message_image(event):
         columns = get_carousel_columns(data)
         carousel_template = CarouselTemplate(columns=columns)
         message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
+            alt_text='比對結果', template=carousel_template)
 
     elif mode == 'emotion_recognition':
         response_text = f"分析情緒：{data['emotion']}"
