@@ -333,7 +333,7 @@ Noisy Student是2020年由Google提出的CV領域的論文，是近期較具指�
 
     #-------------------------------RASA-------------------------------
     elif text == 'RASA':
-        response_text = "請輸入英文！目前支援情境為\n1.詢問你是誰(who are you?)\n2.想了解關於我更多的資訊(Tell me more about you)\n3.安慰情緒(I'm sad)""
+        response_text = "請輸入英文！目前支援情境為\n1.詢問你是誰(who are you?)\n2.想了解關於我更多的資訊(Tell me more about you)\n3.安慰情緒(I'm sad)"
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=response_text)
         )
