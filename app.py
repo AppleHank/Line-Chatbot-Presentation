@@ -82,6 +82,7 @@ def get_CV_demo_message(text):
         title='皓凱Chatbot', text='作品Demo選單', actions=[
             MessageAction(label='人臉相似度', text='人臉相似度'),
             MessageAction(label='臉部情緒分析', text='臉部情緒分析'),
+            MessageAction(label='RASA Chatbot', text='RASA Demo'),
         ])
     template_message = TemplateSendMessage(
         alt_text='作品Demo', template=buttons_template)
@@ -99,8 +100,7 @@ def get_info_message(text):
             MessageAction(label='你是誰', text='你是誰'),
             MessageAction(label='我想看履歷', text='履歷'),
             MessageAction(label='我想看實習經歷 / 作品', text='實習經歷 / 作品'),
-            MessageAction(label='臉部辨識/情緒分析 Demo', text='作品Demo'),
-            MessageAction(label='RASA Chatbot Demo', text='RASA Demo')
+            MessageAction(label='臉部辨識/情緒分析/RASA Demo', text='作品Demo'),
         ])
     template_message = TemplateSendMessage(
         alt_text='了解我', template=follow_buttons_template)
