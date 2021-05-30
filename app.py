@@ -144,7 +144,7 @@ def get_carousel_columns(data):
     carousel_columns = []
     top_similarity = data['similarity'] # <tuple> (<str> name of a similar star, <int> similarity score between 0 to 100)
     file_names = data['names']
-    eng_name_to_chinese = {'ihow':'劉以豪','chenwu':'金城武','user':'李皓凱','jaychou':'周杰倫','chi0':'林志玲'}
+    eng_name_to_chinese = {'ihow':'劉以豪','chenwu':'金城武','user':'李皓凱','jaychou':'周杰倫','chi0':'林志玲','emma':'艾瑪華森'}
     for index,(file_name,similarity) in enumerate(zip(file_names,top_similarity)):
         star_name_eng = similarity[0]
         star_name_chi = eng_name_to_chinese[star_name_eng]
